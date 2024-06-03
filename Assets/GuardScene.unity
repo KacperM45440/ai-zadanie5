@@ -203,6 +203,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6714142460789114917, guid: 87f465c82db6b484ca3ec1be1dd799fb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 786520895}
+    - targetCorrespondingSourceObject: {fileID: 6714142460789114917, guid: 87f465c82db6b484ca3ec1be1dd799fb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 786520898}
   m_SourcePrefab: {fileID: 100100000, guid: 87f465c82db6b484ca3ec1be1dd799fb, type: 3}
 --- !u!1 &88647349
 GameObject:
@@ -1686,14 +1689,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0d1206149bd3834089a55c355931796, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerRef: {fileID: 1597971484}
   movementSpeed: 1
   agentRef: {fileID: 786520893}
+  canSpot: 0
   patrolPoints:
   - patrolPoint: {fileID: 270736630}
   - patrolPoint: {fileID: 153568113}
   - patrolPoint: {fileID: 2041713589}
   - patrolPoint: {fileID: 159606742}
   - patrolPoint: {fileID: 1670891323}
+  enemyState: 0
+--- !u!135 &786520898
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786520889}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 7
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1001 &830883468
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2647,6 +2674,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3263958735345679507, guid: 600be4a371d7c41a58b162eb0d4ffdb7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.1836138
+      objectReference: {fileID: 0}
+    - target: {fileID: 5608710338409781180, guid: 600be4a371d7c41a58b162eb0d4ffdb7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.1836138
+      objectReference: {fileID: 0}
     - target: {fileID: 8887805404360314615, guid: 600be4a371d7c41a58b162eb0d4ffdb7, type: 3}
       propertyPath: m_Name
       value: FPCharacter
@@ -2656,6 +2691,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 600be4a371d7c41a58b162eb0d4ffdb7, type: 3}
+--- !u!4 &1597971484 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 572323189224076289, guid: 600be4a371d7c41a58b162eb0d4ffdb7, type: 3}
+  m_PrefabInstance: {fileID: 1520082996}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1629086063
 PrefabInstance:
   m_ObjectHideFlags: 0
