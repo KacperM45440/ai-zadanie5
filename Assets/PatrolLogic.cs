@@ -7,16 +7,13 @@ public class PatrolLogic : MonoBehaviour
 {
     [SerializeField] private Transform playerRef;
     [SerializeField] private float movementSpeed;
-    [SerializeField] private NavMeshAgent agentRef;
-    [SerializeField] private bool canSpot;
     [SerializeField] private float chaseDuration = 5f;
-    [SerializeField] private float attackRange = 5f;
-    [SerializeField] private int maxAttacks = 1;
+    [SerializeField] private float attackRange = 1f;
+    private NavMeshAgent agentRef;
+    private Animator animatorRef;
     private int currentPoint;
-    private Collider detectionZone;
-    private Coroutine chaseCoroutine;
-    private Coroutine attackCoroutine;
-    private int attackCount;
+    private bool canSpot;
+    private bool canAttack;
 
     [System.Serializable]
     public struct PatrolStruct
@@ -37,13 +34,14 @@ public class PatrolLogic : MonoBehaviour
 
     void Start()
     {
-        detectionZone = GetComponent<Collider>();
         currentPoint = 0;
         enemyState = EnemyState.Patrol;
-        agentRef.speed = movementSpeed;
+        animatorRef = GetComponent<Animator>();
+        agentRef = GetComponent<NavMeshAgent>();
+        animatorRef.SetTrigger("isWalking");
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         ProcessLogic();
     }
@@ -75,61 +73,15 @@ public class PatrolLogic : MonoBehaviour
 
         if (other.transform == playerRef)
         {
-            if (chaseCoroutine != null)
-            {
-                StopCoroutine(chaseCoroutine);
-            }
-
-            chaseCoroutine = StartCoroutine(ChasePlayer());
+            enemyState = EnemyState.Chase;
         }
     }
 
-    private IEnumerator ChasePlayer()
-    {
-        enemyState = EnemyState.Chase;
-        float chaseTime = 0f;
-
-        while (chaseTime < chaseDuration)
-        {
-            agentRef.destination = playerRef.position;
-
-            if (Vector3.Distance(transform.position, playerRef.position) <= attackRange)
-            {
-                if (attackCoroutine != null)
-                {
-                    StopCoroutine(attackCoroutine);
-                }
-
-                attackCoroutine = StartCoroutine(AttackPlayer());
-                yield break;
-            }
-
-            chaseTime += Time.deltaTime;
-            yield return null;
-        }
-
-        enemyState = EnemyState.Patrol;
-    }
-
-    private IEnumerator AttackPlayer()
-    {
-        enemyState = EnemyState.Attack;
-        attackCount = 0;
-
-        while (attackCount < maxAttacks)
-        {
-            //gdzies tu animacja
-            attackCount++;
-            yield return new WaitForSeconds(1f); 
-        }
-
-        enemyState = EnemyState.Patrol;
-        canSpot = false;
-    }
 
     public void Move()
     {
-        Vector3 newPos = new Vector3(patrolPoints[currentPoint].patrolPoint.position.x, transform.position.y, patrolPoints[currentPoint].patrolPoint.position.z);
+        agentRef.speed = movementSpeed;
+        Vector3 newPos = new(patrolPoints[currentPoint].patrolPoint.position.x, transform.position.y, patrolPoints[currentPoint].patrolPoint.position.z);
 
         if (Vector3.Distance(agentRef.transform.position, newPos) > 0.1f)
         {
@@ -139,6 +91,7 @@ public class PatrolLogic : MonoBehaviour
         {
             currentPoint++;
             canSpot = true;
+            canAttack = true;
             if (currentPoint >= patrolPoints.Count)
             {
                 currentPoint = 0;
@@ -148,19 +101,55 @@ public class PatrolLogic : MonoBehaviour
 
     public void Chase()
     {
-        if (chaseCoroutine != null)
+        if (!canSpot)
         {
-            StopCoroutine(chaseCoroutine);
+            return;
         }
-        chaseCoroutine = StartCoroutine(ChasePlayer());
+
+        canSpot = false;
+        agentRef.speed = movementSpeed * 2;
+        StartCoroutine(ChaseCoroutine());
     }
 
+    private IEnumerator ChaseCoroutine()
+    {
+        float chaseTime = 0f;
+        animatorRef.SetTrigger("isRunning");
+        while (chaseTime < chaseDuration)
+        {
+            agentRef.destination = playerRef.position;
+
+            if (Vector3.Distance(transform.position, playerRef.position) <= attackRange)
+            {
+                enemyState = EnemyState.Attack;
+                yield break;
+            }
+
+            chaseTime += Time.deltaTime;
+            yield return null;
+        }
+
+        animatorRef.SetTrigger("isWalking");
+        enemyState = EnemyState.Patrol;
+    }
     public void Attack()
     {
-        if (attackCoroutine != null)
+        if (!canAttack)
         {
-            StopCoroutine(attackCoroutine);
+            return;
         }
-        attackCoroutine = StartCoroutine(AttackPlayer());
+
+        canAttack = false;
+        StartCoroutine(AttackCoroutine());
+    }
+
+    private IEnumerator AttackCoroutine()
+    {
+        agentRef.isStopped = true;
+        animatorRef.SetTrigger("isShooting");
+        yield return new WaitForSeconds(2f);
+        agentRef.isStopped = false;
+        animatorRef.SetTrigger("isWalking");
+        enemyState = EnemyState.Patrol;
     }
 }
